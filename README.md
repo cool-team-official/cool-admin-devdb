@@ -7,7 +7,7 @@
 1.拉取仓库
 
 ```sh
-git clone https://xxxxxxxx.git
+git clone https://github.com/cool-team-official/cool-admin-devdb.git
 ```
 
 2.编辑`docker-compose.yml`,根据注释修改数据库密码及库名（可选操作，如修改后注意同步修改`cool-admin-midway`中的`config.local.ts`中的相关配置）
