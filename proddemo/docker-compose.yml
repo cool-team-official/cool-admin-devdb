@@ -1,0 +1,57 @@
+version: "3.1"
+
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - ./data/mysql/:/var/lib/mysql/
+      - ./initdb/:/docker-entrypoint-initdb.d/
+    environment:
+      TZ: Asia/Shanghai # 指定时区
+      MYSQL_ROOT_PASSWORD: "xaA4v8r5LGnbLOXp" # 配置root用户密码
+      MYSQL_DATABASE: "cool" # 业务库名
+      MYSQL_USER: "cool" # 业务库用户名
+      MYSQL_PASSWORD: "xaA4v8r5LGnbLOXp" # 业务库密码
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      TZ: Asia/Shanghai # 指定时区
+
+  redis:
+    image: redis
+    # command: --requirepass "xaA4v8r5LGnbLOXp" # redis库密码,不需要密码注释本行
+    restart: always
+    environment:
+      TZ: Asia/Shanghai # 指定时区
+    volumes:
+      - ./data/redis/:/data/
+
+  midway:
+    build: https://gitee.com/cool-team-official/cool-admin-midway.git # 替换为自已的git地址,或本地目录地址
+    image: gcslaoli/cool-admin-midway-demo # 替换为自己要发布的registry的地址，不发布可不修改
+    restart: always
+    depends_on:
+      - db
+      - redis
+    environment:
+      TZ: Asia/Shanghai # 指定时区
+      MYSQL_HOST: "db"
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: "cool" # 业务库名
+      MYSQL_USER: "cool" # 业务库用户名
+      MYSQL_PASSWORD: "xaA4v8r5LGnbLOXp" # 业务库密码
+
+  vue:
+    build: https://gitee.com/cool-team-official/cool-admin-vue.git # 替换为自已的git地址,或本地目录地址
+    image: gcslaoli/cool-admin-vue-demo # 替换为自己要发布的registry的地址，不发布可不修改
+    restart: always
+    environment:
+      TZ: Asia/Shanghai # 指定时区
+    depends_on:
+      - midway
+    ports:
+      - 10000:80 # 将10000改成需要对外发布的端口
